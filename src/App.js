@@ -1,50 +1,44 @@
+import {
+  BrowserRouter,
+  Routes,
+  Route
+} from "react-router-dom"
+
 import Navbar from "./components/Navbar"
-import DashboardCard from "./components/DashboardCard"
+
+import Dashboard from "./pages/Dashboard"
+import Workouts from "./pages/Workouts"
+import Profile from "./pages/Profile"
 
 function App() {
   return (
-    <div
-      style={{
-        backgroundColor: "#121212",
-        minHeight: "100vh"
-      }}
-    >
-      <Navbar />
+    <BrowserRouter>
+      <div
+        style={{
+          backgroundColor: "#121212",
+          minHeight: "100vh"
+        }}
+      >
+        <Navbar />
 
-      <main style={{ padding: "30px" }}>
-        <h1
-          style={{
-            color: "white",
-            marginBottom: "30px"
-          }}
-        >
-          Dashboard
-        </h1>
-
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            flexWrap: "wrap"
-          }}
-        >
-          <DashboardCard
-            title="Workouts This Week"
-            value="0"
+        <Routes>
+          <Route
+            path="/"
+            element={<Dashboard />}
           />
 
-          <DashboardCard
-            title="Current Streak"
-            value="0 Days"
+          <Route
+            path="/workouts"
+            element={<Workouts />}
           />
 
-          <DashboardCard
-            title="Calories Burned"
-            value="0"
+          <Route
+            path="/profile"
+            element={<Profile />}
           />
-        </div>
-      </main>
-    </div>
+        </Routes>
+      </div>
+    </BrowserRouter>
   )
 }
 
