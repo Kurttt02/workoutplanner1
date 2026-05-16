@@ -8,7 +8,7 @@ function Profile() {
     >
       <h1>Profile</h1>
 
-      <p>Your account information will appear here.</p>
+      <p>test profile work here need to insertlater.</p>
     </main>
   )
 }

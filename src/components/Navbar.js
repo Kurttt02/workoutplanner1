@@ -22,21 +22,30 @@ function Navbar() {
       >
         <Link
           to="/"
-          style={{ color: "white", textDecoration: "none" }}
+          style={{
+            color: "white",
+            textDecoration: "none"
+          }}
         >
           Dashboard
         </Link>
 
         <Link
           to="/workouts"
-          style={{ color: "white", textDecoration: "none" }}
+          style={{
+            color: "white",
+            textDecoration: "none"
+          }}
         >
           Workouts
         </Link>
 
         <Link
           to="/profile"
-          style={{ color: "white", textDecoration: "none" }}
+          style={{
+            color: "white",
+            textDecoration: "none"
+          }}
         >
           Profile
         </Link>
