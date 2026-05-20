@@ -1,16 +1,53 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import WorkoutForm from "../components/WorkoutForm"
 import WorkoutItem from "../components/WorkoutItem"
 
 function Workouts() {
-  const [workouts, setWorkouts] = useState([
-    "Push Day",
-    "Pull Day"
-  ])
+  const [workouts, setWorkouts] = useState(() => {
+    const savedWorkouts =
+      localStorage.getItem("workouts")
 
-  function addWorkout(workoutName) {
-    setWorkouts([...workouts, workoutName])
+    return savedWorkouts
+      ? JSON.parse(savedWorkouts)
+      : []
+  })
+
+  useEffect(() => {
+    localStorage.setItem(
+      "workouts",
+      JSON.stringify(workouts)
+    )
+  }, [workouts])
+
+  function addWorkout(newWorkout) {
+    setWorkouts([...workouts, newWorkout])
+  }
+
+  function deleteWorkout(indexToDelete) {
+    const updatedWorkouts = workouts.filter(
+      (_, index) => index !== indexToDelete
+    )
+
+    setWorkouts(updatedWorkouts)
+  }
+
+  function editWorkout(indexToEdit, newName) {
+    const updatedWorkouts = [...workouts]
+
+    updatedWorkouts[indexToEdit].name = newName
+
+    setWorkouts(updatedWorkouts)
+  }
+
+  function addExercise(workoutIndex, exercise) {
+    const updatedWorkouts = [...workouts]
+
+    updatedWorkouts[
+      workoutIndex
+    ].exercises.push(exercise)
+
+    setWorkouts(updatedWorkouts)
   }
 
   return (
@@ -30,14 +67,20 @@ function Workouts() {
 
       <WorkoutForm addWorkout={addWorkout} />
 
-      <div>
-        {workouts.map((workout, index) => (
+      {workouts.length === 0 ? (
+        <p>No workouts added yet.</p>
+      ) : (
+        workouts.map((workout, index) => (
           <WorkoutItem
             key={index}
-            name={workout}
+            workout={workout}
+            index={index}
+            deleteWorkout={deleteWorkout}
+            editWorkout={editWorkout}
+            addExercise={addExercise}
           />
-        ))}
-      </div>
+        ))
+      )}
     </main>
   )
 }

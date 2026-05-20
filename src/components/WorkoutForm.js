@@ -8,7 +8,12 @@ function WorkoutForm({ addWorkout }) {
 
     if (workoutName.trim() === "") return
 
-    addWorkout(workoutName)
+    const newWorkout = {
+      name: workoutName,
+      exercises: []
+    }
+
+    addWorkout(newWorkout)
 
     setWorkoutName("")
   }
@@ -22,7 +27,7 @@ function WorkoutForm({ addWorkout }) {
     >
       <input
         type="text"
-        placeholder="Enter workout name"
+        placeholder="Workout name"
         value={workoutName}
         onChange={(event) =>
           setWorkoutName(event.target.value)
