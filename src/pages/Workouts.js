@@ -50,11 +50,29 @@ function Workouts() {
     setWorkouts(updatedWorkouts)
   }
 
+  function toggleExerciseComplete(
+    workoutIndex,
+    exerciseIndex
+  ) {
+    const updatedWorkouts = [...workouts]
+
+    const exercise =
+      updatedWorkouts[workoutIndex].exercises[
+        exerciseIndex
+      ]
+
+    exercise.completed = !exercise.completed
+
+    setWorkouts(updatedWorkouts)
+  }
+
   return (
     <main
       style={{
         padding: "30px",
-        color: "white"
+        color: "white",
+        maxWidth: "1000px",
+        margin: "0 auto"
       }}
     >
       <h1
@@ -78,6 +96,9 @@ function Workouts() {
             deleteWorkout={deleteWorkout}
             editWorkout={editWorkout}
             addExercise={addExercise}
+            toggleExerciseComplete={
+              toggleExerciseComplete
+            }
           />
         ))
       )}

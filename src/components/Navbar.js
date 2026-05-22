@@ -12,7 +12,7 @@ function Navbar() {
         alignItems: "center"
       }}
     >
-      <h2>AI Workout Planner</h2>
+      <h2>Workout Planner</h2>
 
       <div
         style={{
