@@ -8,89 +8,110 @@ function Workouts() {
 
   useEffect(() => {
     fetch("http://localhost:5000/api/workouts")
-      .then((response) => response.json())
+      .then((res) => res.json())
       .then((data) => setWorkouts(data))
   }, [])
 
-  function addWorkout(newWorkout) {
-    setWorkouts([...workouts, newWorkout])
+  function addWorkout(name) {
+    fetch("http://localhost:5000/api/workouts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name })
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setWorkouts([...workouts, data])
+      })
   }
 
-  function deleteWorkout(indexToDelete) {
-    const updatedWorkouts = workouts.filter(
-      (_, index) => index !== indexToDelete
-    )
+ function deleteWorkout(id) {
+  console.log("DELETE ID:", id)
 
-    setWorkouts(updatedWorkouts)
+  fetch(`http://localhost:5000/api/workouts/${id}`, {
+    method: "DELETE"
+  }).then(() => {
+    setWorkouts(workouts.filter(w => w._id !== id))
+  })
+}
+
+  function editWorkout(id, newName) {
+    fetch(`http://localhost:5000/api/workouts/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name: newName })
+    })
+      .then(res => res.json())
+      .then(updated => {
+        setWorkouts(
+          workouts.map(w =>
+            w._id === id ? updated : w
+          )
+        )
+      })
   }
 
-  function editWorkout(indexToEdit, newName) {
-    const updatedWorkouts = [...workouts]
-
-    updatedWorkouts[indexToEdit].name = newName
-
-    setWorkouts(updatedWorkouts)
+  function addExercise(workoutId, exercise) {
+    fetch(`http://localhost:5000/api/workouts/${workoutId}/exercises`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(exercise)
+    })
+      .then(res => res.json())
+      .then(updatedWorkout => {
+        setWorkouts(
+          workouts.map(w =>
+            w._id === workoutId ? updatedWorkout : w
+          )
+        )
+      })
   }
 
-  function addExercise(workoutIndex, exercise) {
-    const updatedWorkouts = [...workouts]
+  function toggleExercise(workoutId, exerciseIndex) {
+    const workout = workouts.find(w => w._id === workoutId)
 
-    updatedWorkouts[
-      workoutIndex
-    ].exercises.push(exercise)
+    workout.exercises[exerciseIndex].completed =
+      !workout.exercises[exerciseIndex].completed
 
-    setWorkouts(updatedWorkouts)
-  }
-
-  function toggleExerciseComplete(
-    workoutIndex,
-    exerciseIndex
-  ) {
-    const updatedWorkouts = [...workouts]
-
-    const exercise =
-      updatedWorkouts[workoutIndex].exercises[
-        exerciseIndex
-      ]
-
-    exercise.completed = !exercise.completed
-
-    setWorkouts(updatedWorkouts)
+    fetch(`http://localhost:5000/api/workouts/${workoutId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(workout)
+    })
+      .then(res => res.json())
+      .then(updated => {
+        setWorkouts(
+          workouts.map(w =>
+            w._id === workoutId ? updated : w
+          )
+        )
+      })
   }
 
   return (
-    <main
-      style={{
-        padding: "30px",
-        color: "white",
-        maxWidth: "1000px",
-        margin: "0 auto"
-      }}
-    >
-      <h1
-        style={{
-          marginBottom: "30px"
-        }}
-      >
-        Kurt's Workout Planner
-      </h1>
+    <main style={{ padding: "30px", color: "white" }}>
+      <h1>Kurt's Workout Planner</h1>
 
       <WorkoutForm addWorkout={addWorkout} />
 
       {workouts.length === 0 ? (
-        <p>No workouts added yet.</p>
+        <p>No workouts yet.</p>
       ) : (
-        workouts.map((workout, index) => (
+        workouts.map(workout => (
           <WorkoutItem
-            key={index}
+            key={workout._id}
             workout={workout}
-            index={index}
             deleteWorkout={deleteWorkout}
             editWorkout={editWorkout}
             addExercise={addExercise}
-            toggleExerciseComplete={
-              toggleExerciseComplete
-            }
+            toggleExercise={toggleExercise}
           />
         ))
       )}

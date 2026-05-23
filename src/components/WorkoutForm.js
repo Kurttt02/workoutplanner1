@@ -8,50 +8,20 @@ function WorkoutForm({ addWorkout }) {
 
     if (workoutName.trim() === "") return
 
-    const newWorkout = {
-      name: workoutName,
-      exercises: []
-    }
-
-    addWorkout(newWorkout)
+    addWorkout(workoutName)
 
     setWorkoutName("")
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      style={{
-        marginBottom: "30px"
-      }}
-    >
+    <form onSubmit={handleSubmit}>
       <input
-        type="text"
-        placeholder="Workout name"
         value={workoutName}
-        onChange={(event) =>
-          setWorkoutName(event.target.value)
-        }
-        style={{
-          padding: "12px",
-          width: "300px",
-          marginRight: "10px",
-          borderRadius: "8px",
-          border: "none"
-        }}
+        onChange={(e) => setWorkoutName(e.target.value)}
+        placeholder="Workout name"
       />
 
-      <button
-        type="submit"
-        style={{
-          padding: "12px 20px",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer"
-        }}
-      >
+      <button type="submit">
         Add Workout
       </button>
     </form>
