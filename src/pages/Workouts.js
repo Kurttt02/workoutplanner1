@@ -4,21 +4,13 @@ import WorkoutForm from "../components/WorkoutForm"
 import WorkoutItem from "../components/WorkoutItem"
 
 function Workouts() {
-  const [workouts, setWorkouts] = useState(() => {
-    const savedWorkouts =
-      localStorage.getItem("workouts")
-
-    return savedWorkouts
-      ? JSON.parse(savedWorkouts)
-      : []
-  })
+  const [workouts, setWorkouts] = useState([])
 
   useEffect(() => {
-    localStorage.setItem(
-      "workouts",
-      JSON.stringify(workouts)
-    )
-  }, [workouts])
+    fetch("http://localhost:5000/api/workouts")
+      .then((response) => response.json())
+      .then((data) => setWorkouts(data))
+  }, [])
 
   function addWorkout(newWorkout) {
     setWorkouts([...workouts, newWorkout])
@@ -80,7 +72,7 @@ function Workouts() {
           marginBottom: "30px"
         }}
       >
-        Workouts
+        Kurt's Workout Planner
       </h1>
 
       <WorkoutForm addWorkout={addWorkout} />
