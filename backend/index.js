@@ -1,54 +1,71 @@
 const express = require("express")
 const cors = require("cors")
+const mongoose = require("mongoose")
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
 
-let workouts = [
-  {
-    id: 1,
-    name: "Push Day",
-    exercises: []
-  }
-]
+mongoose
+  .connect(
+    "mongodb+srv://kurt:workout123@kurts-workout-planner.wkignqq.mongodb.net/?appName=kurts-workout-planner"
+  )
+  .then(() => {
+    console.log("MongoDB connected")
+  })
+  .catch((error) => {
+    console.log(error)
+  })
 
-app.get("/api/workouts", (req, res) => {
+const WorkoutSchema = new mongoose.Schema({
+  name: String,
+  exercises: Array
+})
+
+const Workout = mongoose.model(
+  "Workout",
+  WorkoutSchema
+)
+
+app.get("/api/workouts", async (req, res) => {
+  const workouts = await Workout.find()
+
   res.json(workouts)
 })
 
-app.post("/api/workouts", (req, res) => {
-  const newWorkout = {
-    id: Date.now(),
+app.post("/api/workouts", async (req, res) => {
+  const newWorkout = new Workout({
     name: req.body.name,
     exercises: []
-  }
+  })
 
-  workouts.push(newWorkout)
+  await newWorkout.save()
 
   res.json(newWorkout)
 })
 
-app.put("/api/workouts/:id", (req, res) => {
-  const id = Number(req.params.id)
-
-  workouts = workouts.map((w) =>
-    w.id === id
-      ? { ...w, name: req.body.name }
-      : w
+app.put("/api/workouts/:id", async (req, res) => {
+  await Workout.findByIdAndUpdate(
+    req.params.id,
+    {
+      name: req.body.name
+    }
   )
 
   res.json({ message: "updated" })
 })
 
-app.delete("/api/workouts/:id", (req, res) => {
-  const id = Number(req.params.id)
+app.delete(
+  "/api/workouts/:id",
+  async (req, res) => {
+    await Workout.findByIdAndDelete(
+      req.params.id
+    )
 
-  workouts = workouts.filter((w) => w.id !== id)
-
-  res.json({ message: "deleted" })
-})
+    res.json({ message: "deleted" })
+  }
+)
 
 const PORT = 5000
 
