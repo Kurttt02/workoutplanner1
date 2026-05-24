@@ -3,6 +3,7 @@ const express = require("express")
 const cors = require("cors")
 const mongoose = require("mongoose")
 const { GoogleGenerativeAI } = require("@google/generative-ai")
+const User = require("./models/User")
 
 const app = express()
 
@@ -30,6 +31,80 @@ const WorkoutSchema = new mongoose.Schema({
 })
 
 const Workout = mongoose.model("Workout", WorkoutSchema)
+
+app.post("/api/register", async (req, res) => {
+  const { username, password } = req.body
+
+  const existingUser = await User.findOne({ username })
+
+  if (existingUser) {
+    return res.status(400).json({
+      message: "User already exists"
+    })
+  }
+
+  const user = await User.create({
+    username,
+    password
+  })
+
+  res.json(user)
+})
+
+app.post("/api/login", async (req, res) => {
+  const { username, password } = req.body
+
+  const user = await User.findOne({
+    username,
+    password
+  })
+
+  if (!user) {
+    return res.status(400).json({
+      message: "Invalid credentials"
+    })
+  }
+
+  res.json(user)
+})
+
+app.post("/api/coach", async (req, res) => {
+  const { message } = req.body
+
+  try {
+    const prompt = `
+You are a fitness coach.
+
+Return answers in this format ONLY:
+
+Short answer:
+- 2 to 4 sentences max
+
+Key points:
+- 3 to 5 bullet points only
+
+No long paragraphs.
+No essays.
+Keep it simple, clear, and easy to read.
+
+
+Answer this question:
+${message}
+`
+
+    const result = await model.generateContent(prompt)
+    const response = await result.response
+    const text = response.text()
+
+    res.json({ reply: text })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({
+      error: "Coach failed"
+    })
+  }
+})
+
 
 app.get("/api/workouts", async (req, res) => {
   const workouts = await Workout.find()
@@ -110,5 +185,7 @@ Return ONLY valid JSON:
     res.status(500).json({ error: "AI generation failed" })
   }
 })
+
+
 
 app.listen(5000, () => console.log("Server running on 5000"))
