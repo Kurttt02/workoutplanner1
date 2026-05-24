@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-
 import WorkoutForm from "../components/WorkoutForm"
 import WorkoutItem from "../components/WorkoutItem"
 import Dashboard from "../components/Dashboard"
@@ -9,146 +8,148 @@ function Workouts() {
 
   useEffect(() => {
     fetch("http://localhost:5000/api/workouts")
-      .then((res) => res.json())
-      .then((data) => setWorkouts(data))
+      .then(res => res.json())
+      .then(data => setWorkouts(data))
   }, [])
 
   function addWorkout(name) {
     fetch("http://localhost:5000/api/workouts", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name })
     })
-      .then((res) => res.json())
-      .then((data) => {
-        setWorkouts([...workouts, data])
-      })
+      .then(res => res.json())
+      .then(data => setWorkouts(prev => [...prev, data]))
   }
 
   function deleteWorkout(id) {
     fetch(`http://localhost:5000/api/workouts/${id}`, {
       method: "DELETE"
     }).then(() => {
-      setWorkouts(
-        workouts.filter((w) => w._id !== id)
-      )
+      setWorkouts(prev => prev.filter(w => w._id !== id))
     })
   }
 
   function editWorkout(id, newName) {
     fetch(`http://localhost:5000/api/workouts/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: newName })
     })
-      .then((res) => res.json())
-      .then((updated) => {
-        setWorkouts(
-          workouts.map((w) =>
-            w._id === id ? updated : w
-          )
+      .then(res => res.json())
+      .then(updated => {
+        setWorkouts(prev =>
+          prev.map(w => (w._id === id ? updated : w))
         )
       })
   }
 
   function addExercise(workoutId, exercise) {
-    fetch(
-      `http://localhost:5000/api/workouts/${workoutId}/exercises`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(exercise)
-      }
-    )
-      .then((res) => res.json())
-      .then((updatedWorkout) => {
-        setWorkouts(
-          workouts.map((w) =>
-            w._id === workoutId
-              ? updatedWorkout
-              : w
+    fetch(`http://localhost:5000/api/workouts/${workoutId}/exercises`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(exercise)
+    })
+      .then(res => res.json())
+      .then(updatedWorkout => {
+        setWorkouts(prev =>
+          prev.map(w =>
+            w._id === workoutId ? updatedWorkout : w
           )
         )
       })
   }
 
-  function toggleExercise(workoutId, exerciseIndex) {
-    const workout = workouts.find(
-      (w) => w._id === workoutId
-    )
-
-    workout.exercises[exerciseIndex].completed =
-      !workout.exercises[exerciseIndex].completed
-
-    fetch(
-      `http://localhost:5000/api/workouts/${workoutId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(workout)
-      }
-    )
-      .then((res) => res.json())
-      .then((updated) => {
-        setWorkouts(
-          workouts.map((w) =>
-            w._id === workoutId ? updated : w
-          )
-        )
+  function generateWorkout(goal) {
+    fetch("http://localhost:5000/api/generate-workout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ goal })
+    })
+      .then(res => res.json())
+      .then(aiWorkout => {
+        return fetch("http://localhost:5000/api/workouts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(aiWorkout)
+        })
+      })
+      .then(res => res.json())
+      .then(savedWorkout => {
+        setWorkouts(prev => [...prev, savedWorkout])
       })
   }
 
+function toggleExercise(workoutId, exerciseIndex) {
+  setWorkouts(prev => {
+    const updated = prev.map(workout => {
+      if (workout._id !== workoutId) return workout
+
+      return {
+        ...workout,
+        exercises: workout.exercises.map((ex, i) =>
+          i === exerciseIndex
+            ? { ...ex, completed: !ex.completed }
+            : ex
+        )
+      }
+    })
+
+    const changed = updated.find(w => w._id === workoutId)
+
+    fetch(`http://localhost:5000/api/workouts/${workoutId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(changed)
+    })
+
+    return updated
+  })
+}
   return (
-    <main style={styles.page}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>
-          Kurt's Workout Planner
-        </h1>
-
-        <p style={styles.subtitle}>
-          Track workouts and monitor progress
-        </p>
-      </div>
+    <main style={{ padding: "30px", color: "white" }}>
+      <h1>Kurt's Workout Planner</h1>
 
       <Dashboard workouts={workouts} />
 
-      <div style={styles.formBox}>
-        <WorkoutForm addWorkout={addWorkout} />
-      </div>
+      <WorkoutForm addWorkout={addWorkout} />
+<div style={styles.buttonRow}>
+  <button
+    onClick={() => generateWorkout("muscle")}
+    style={{ ...styles.button, backgroundColor: "#1f1f1f", color: "#ffffff" }}
+  >
+     Muscle Build
+  </button>
 
-      <div style={styles.workoutList}>
-        {workouts.length === 0 ? (
-          <div style={styles.emptyCard}>
-            <h3>No workouts yet</h3>
+  <button
+    onClick={() => generateWorkout("fat loss")}
+    style={{ ...styles.button, backgroundColor: "#1f1f1f", color: "#ffffff" }}
+  >
+     Fat Burn
+  </button>
 
-            <p>
-              Create your first workout above.
-            </p>
-          </div>
-        ) : (
-          workouts.map((workout) => (
-            <WorkoutItem
-              key={workout._id}
-              workout={workout}
-              deleteWorkout={deleteWorkout}
-              editWorkout={editWorkout}
-              addExercise={addExercise}
-              toggleExercise={toggleExercise}
-            />
-          ))
-        )}
-      </div>
+  <button
+    onClick={() => generateWorkout("strength")}
+    style={{ ...styles.button, backgroundColor: "#1f1f1f", color: "#ffffff" }}
+  >
+     Strength
+  </button>
+</div>
+
+      {workouts.map(workout => (
+        <WorkoutItem
+          key={workout._id}
+          workout={workout}
+          deleteWorkout={deleteWorkout}
+          editWorkout={editWorkout}
+          addExercise={addExercise}
+          toggleExercise={toggleExercise}
+        />
+      ))}
     </main>
   )
 }
+
 
 const styles = {
   page: {
@@ -173,6 +174,25 @@ const styles = {
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent"
   },
+
+  buttonRow: {
+  display: "flex",
+  gap: "12px",
+  margin: "20px 0",
+  flexWrap: "wrap"
+},
+
+button: {
+  backgroundColor: "#1e1e1e",
+  color: "#ffffff",
+  border: "1px solid #2a2a2a",
+  padding: "12px 16px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontSize: "14px",
+  fontWeight: "500",
+  transition: "all 0.2s ease"
+},
 
   subtitle: {
     color: "#94a3b8",
@@ -208,5 +228,6 @@ const styles = {
     border: "1px solid rgba(255,255,255,0.08)"
   }
 }
+
 
 export default Workouts
