@@ -80,29 +80,32 @@ const styles = {
   },
 
   chatBox: {
-    backgroundColor: "#111",
-    border: "1px solid #222",
-    borderRadius: "12px",
-    padding: "20px",
-    height: "500px",
-    overflowY: "auto",
-    marginBottom: "20px"
-  },
+  backgroundColor: "#111",
+  border: "1px solid #222",
+  borderRadius: "16px",
+  padding: "20px",
+  height: "500px",
+  overflowY: "auto",
+  marginBottom: "20px"
+},
 
   userMessage: {
-    backgroundColor: "#2a2a2a",
-    padding: "12px",
-    borderRadius: "10px",
-    marginBottom: "12px"
-  },
-
- aiMessage: {
-  backgroundColor: "#1a1a1a",
+  backgroundColor: "#2a2a2a",
   padding: "14px",
   borderRadius: "12px",
-  marginBottom: "12px",
+  marginBottom: "14px",
+  marginLeft: "auto",
+  maxWidth: "80%"
+},
+
+ aiMessage: {
+  backgroundColor: "#181818",
+  padding: "14px",
+  borderRadius: "12px",
+  marginBottom: "14px",
+  maxWidth: "80%",
   whiteSpace: "pre-wrap",
-  lineHeight: "1.5"
+  lineHeight: "1.6"
 },
 
   inputRow: {

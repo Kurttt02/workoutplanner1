@@ -153,12 +153,10 @@ function toggleExercise(workoutId, exerciseIndex) {
 
 const styles = {
   page: {
-    minHeight: "100vh",
-    background:
-      "linear-gradient(180deg, #000000, #000000)",
-    padding: "40px",
-    color: "white"
-  },
+  padding: "40px",
+  maxWidth: "1200px",
+  margin: "0 auto"
+},
 
   header: {
     textAlign: "center",
