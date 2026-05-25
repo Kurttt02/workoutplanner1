@@ -1,95 +1,98 @@
 function Dashboard({ workouts }) {
   const totalWorkouts = workouts.length
 
-  const totalExercises = workouts.reduce(
-    (total, workout) =>
-      total + workout.exercises.length,
-    0
-  )
+  let totalExercises = 0
+  let completedExercises = 0
+  let allAchievements = []
 
-  const completedExercises = workouts.reduce(
-    (total, workout) =>
-      total +
-      workout.exercises.filter(
-        (exercise) => exercise.completed
-      ).length,
-    0
-  )
+  workouts.forEach(w => {
+    if (w.exercises) {
+      totalExercises += w.exercises.length
+
+      w.exercises.forEach(ex => {
+        if (ex.completed) completedExercises++
+      })
+    }
+    if (w.achievements) {
+      allAchievements.push(...w.achievements)
+    }
+  })
 
   const completionRate =
     totalExercises === 0
       ? 0
-      : Math.round(
-          (completedExercises / totalExercises) * 100
-        )
+      : Math.round((completedExercises / totalExercises) * 100)
+
+  const uniqueAchievements = [...new Set(allAchievements)]
 
   return (
-    <div style={styles.container}>
+    <div style={styles.grid}>
       <div style={styles.card}>
-        <h2>{totalWorkouts}</h2>
-        <p>Total Workouts</p>
+        <h3>Workouts</h3>
+        <p>{totalWorkouts}</p>
       </div>
 
       <div style={styles.card}>
-        <h2>{totalExercises}</h2>
-        <p>Total Exercises</p>
+        <h3>Exercises</h3>
+        <p>{totalExercises}</p>
       </div>
 
       <div style={styles.card}>
-        <h2>{completedExercises}</h2>
-        <p>Completed</p>
+        <h3>Completed</h3>
+        <p>{completedExercises}</p>
       </div>
 
       <div style={styles.card}>
-        <h2>{completionRate}%</h2>
-        <p>Completion Rate</p>
+        <h3>Completion Rate</h3>
+        <p>{completionRate}%</p>
+      </div>
 
-        <div style={styles.progressBackground}>
-          <div
-            style={{
-              ...styles.progressFill,
-              width: `${completionRate}%`
-            }}
-          />
-        </div>
+
+      <div style={styles.card}>
+        <h3>Achievements</h3>
+        <p>{uniqueAchievements.length}</p>
+      </div>
+
+      <div style={styles.achievements}>
+        {uniqueAchievements.map((a, i) => (
+          <div key={i} style={styles.badge}>
+            {a}
+          </div>
+        ))}
       </div>
     </div>
   )
 }
 
 const styles = {
-  container: {
+  grid: {
     display: "grid",
-    gridTemplateColumns:
-      "repeat(auto-fit, minmax(200px, 1fr))",
-    gap: "20px",
-    marginBottom: "35px"
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+    gap: "15px",
+    marginBottom: "25px"
   },
 
   card: {
-    background:
-      "linear-gradient(145deg, #000000, #0f172a)",
-    padding: "28px",
-    borderRadius: "22px",
-    border: "1px solid rgba(255,255,255,0.08)",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.35)",
+    backgroundColor: "#111",
+    border: "1px solid #222",
+    borderRadius: "14px",
+    padding: "20px",
     textAlign: "center"
   },
 
-  progressBackground: {
-    width: "100%",
-    height: "10px",
-    backgroundColor: "#334155",
-    borderRadius: "999px",
-    marginTop: "12px",
-    overflow: "hidden"
+  achievements: {
+    gridColumn: "1 / -1",
+    display: "flex",
+    gap: "10px",
+    flexWrap: "wrap"
   },
 
-  progressFill: {
-    height: "100%",
-    background:
-      "linear-gradient(to right, #22c55e, #4ade80)",
-    borderRadius: "999px"
+  badge: {
+    backgroundColor: "#1f1f1f",
+    border: "1px solid #333",
+    padding: "8px 12px",
+    borderRadius: "20px",
+    fontSize: "12px"
   }
 }
 

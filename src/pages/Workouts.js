@@ -2,9 +2,11 @@ import { useEffect, useState } from "react"
 import WorkoutForm from "../components/WorkoutForm"
 import WorkoutItem from "../components/WorkoutItem"
 import Dashboard from "../components/Dashboard"
+import { primaryButton } from "../styles/buttons"
 
 function Workouts() {
   const [workouts, setWorkouts] = useState([])
+  const [loadingWorkout, setLoadingWorkout] = useState(false)
 
   useEffect(() => {
     fetch("http://localhost:5000/api/workouts")
@@ -61,6 +63,8 @@ function Workouts() {
   }
 
   function generateWorkout(goal) {
+    setLoadingWorkout(true)
+
     fetch("http://localhost:5000/api/generate-workout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -78,63 +82,71 @@ function Workouts() {
       .then(savedWorkout => {
         setWorkouts(prev => [...prev, savedWorkout])
       })
+      .finally(() => {
+        setLoadingWorkout(false)
+      })
   }
 
-function toggleExercise(workoutId, exerciseIndex) {
-  setWorkouts(prev => {
-    const updated = prev.map(workout => {
-      if (workout._id !== workoutId) return workout
+  function toggleExercise(workoutId, exerciseIndex) {
+    setWorkouts(prev => {
+      const updated = prev.map(workout => {
+        if (workout._id !== workoutId) return workout
 
-      return {
-        ...workout,
-        exercises: workout.exercises.map((ex, i) =>
-          i === exerciseIndex
-            ? { ...ex, completed: !ex.completed }
-            : ex
-        )
-      }
+        return {
+          ...workout,
+          exercises: workout.exercises.map((ex, i) =>
+            i === exerciseIndex
+              ? { ...ex, completed: !ex.completed }
+              : ex
+          )
+        }
+      })
+
+      const changed = updated.find(w => w._id === workoutId)
+
+      fetch(`http://localhost:5000/api/workouts/${workoutId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(changed)
+      })
+
+      return updated
     })
+  }
 
-    const changed = updated.find(w => w._id === workoutId)
-
-    fetch(`http://localhost:5000/api/workouts/${workoutId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(changed)
-    })
-
-    return updated
-  })
-}
   return (
-    <main style={{ padding: "30px", color: "white" }}>
-      <h1>Kurt's Workout Planner</h1>
+    <main style={styles.page}>
+      <h1 style={styles.title}>Workout Planner</h1>
 
       <Dashboard workouts={workouts} />
 
       <WorkoutForm addWorkout={addWorkout} />
-<div style={styles.buttonRow}>
-  <button
-    onClick={() => generateWorkout("muscle")}
-    style={{ ...styles.button, backgroundColor: "#1f1f1f", color: "#ffffff" }}
-  >
-     Muscle Build
-  </button>
 
-  <button
-    onClick={() => generateWorkout("fat loss")}
-    style={{ ...styles.button, backgroundColor: "#1f1f1f", color: "#ffffff" }}
-  >
-     Fat Burn
-  </button>
+      <div style={styles.buttonRow}>
+        <button
+          style={primaryButton}
+          disabled={loadingWorkout}
+          onClick={() => generateWorkout("muscle")}
+        >
+          {loadingWorkout ? "Generating..." : "Build Muscle"}
+        </button>
 
-  <button
-    onClick={() => generateWorkout("strength")}
-    style={{ ...styles.button, backgroundColor: "#1f1f1f", color: "#ffffff" }}
-  >
-     Strength
-  </button>
-</div>
+        <button
+          style={primaryButton}
+          disabled={loadingWorkout}
+          onClick={() => generateWorkout("fat loss")}
+        >
+          {loadingWorkout ? "Generating..." : "Burn Fat"}
+        </button>
+
+        <button
+          style={primaryButton}
+          disabled={loadingWorkout}
+          onClick={() => generateWorkout("strength")}
+        >
+          {loadingWorkout ? "Generating..." : "Get Strong"}
+        </button>
+      </div>
 
       {workouts.map(workout => (
         <WorkoutItem
@@ -150,82 +162,23 @@ function toggleExercise(workoutId, exerciseIndex) {
   )
 }
 
-
 const styles = {
   page: {
-  padding: "40px",
-  maxWidth: "1200px",
-  margin: "0 auto"
-},
-
-  header: {
-    textAlign: "center",
-    marginBottom: "35px"
-  },
-
-  title: {
-    fontSize: "54px",
-    fontWeight: "800",
-    marginBottom: "10px",
-    background:
-      "linear-gradient(to right, #fcfcfc, #8b5cf6)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent"
-  },
-
-  buttonRow: {
-  display: "flex",
-  gap: "12px",
-  margin: "20px 0",
-  flexWrap: "wrap"
-},
-
-button: {
-  backgroundColor: "#1e1e1e",
-  color: "#ffffff",
-  border: "1px solid #2a2a2a",
-  padding: "12px 16px",
-  borderRadius: "10px",
-  cursor: "pointer",
-  fontSize: "14px",
-  fontWeight: "500",
-  transition: "all 0.2s ease"
-},
-
-  subtitle: {
-    color: "#94a3b8",
-    fontSize: "18px"
-  },
-
-  formBox: {
-    maxWidth: "850px",
-    margin: "0 auto 35px auto",
-    background:
-      "linear-gradient(180deg, #000000, #000000)",
-    padding: "30px",
-    borderRadius: "24px",
-    border: "1px solid rgba(255,255,255,0.08)",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.35)"
-  },
-
-  workoutList: {
-    maxWidth: "900px",
+    padding: "40px",
+    maxWidth: "1200px",
     margin: "0 auto",
-    display: "flex",
-    flexDirection: "column",
-    gap: "25px"
+    color: "white"
   },
-
-  emptyCard: {
-    background:
-      "linear-gradient(145deg, #000000, #000000)",
-    padding: "45px",
-    borderRadius: "24px",
-    textAlign: "center",
-    color: "#94a3b8",
-    border: "1px solid rgba(255,255,255,0.08)"
+  title: {
+    fontSize: "42px",
+    marginBottom: "20px"
+  },
+  buttonRow: {
+    display: "flex",
+    gap: "12px",
+    margin: "20px 0",
+    flexWrap: "wrap"
   }
 }
-
 
 export default Workouts

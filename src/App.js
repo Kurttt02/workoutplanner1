@@ -11,6 +11,7 @@ import Profile from "./pages/Profile"
 import Coach from "./pages/Coach"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
+import Achievements from "./pages/Achievements"
 
 function App() {
   const user = JSON.parse(
@@ -33,6 +34,10 @@ function App() {
 
               <Link to="/coach" style={styles.link}>
                 AI Coach
+              </Link>
+
+              <Link to="/achievements" style={styles.link}>
+               Achievements
               </Link>
 
               <Link to="/profile" style={styles.link}>
@@ -83,6 +88,13 @@ function App() {
               ) : (
                 <Navigate to="/login" />
               )
+            }
+          />
+
+          <Route
+            path="/achievements"
+            element={
+              user ? <Achievements /> : <Navigate to="/login" />
             }
           />
 
