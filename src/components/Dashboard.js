@@ -1,28 +1,29 @@
+// Dashboard component that displays workout statistics and achievements based on the provided workouts data
 function Dashboard({ workouts }) {
   const totalWorkouts = workouts.length
 
   let totalExercises = 0
   let completedExercises = 0
   let allAchievements = []
-
+// Iterate through each workout to calculate total exercises, completed exercises, and collect all achievements
   workouts.forEach(w => {
     if (w.exercises) {
       totalExercises += w.exercises.length
-
+// Count completed exercises in the workout
       w.exercises.forEach(ex => {
         if (ex.completed) completedExercises++
       })
-    }
+    }// Collect achievements from the workout
     if (w.achievements) {
       allAchievements.push(...w.achievements)
     }
   })
-
+// Calculate the completion rate as a percentage of completed exercises out of total exercises
   const completionRate =
     totalExercises === 0
       ? 0
       : Math.round((completedExercises / totalExercises) * 100)
-
+// Create a unique list of achievements by removing duplicates using a Set
   const uniqueAchievements = [...new Set(allAchievements)]
 
   return (

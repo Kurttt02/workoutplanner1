@@ -12,12 +12,12 @@ import Coach from "./pages/Coach"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
 import Achievements from "./pages/Achievements"
-
+// Main App component that sets up routing and navigation for the workout planner application, including a navbar with links to different pages and a logout button. It also defines styles for the app and its components.
 function App() {
   const user = JSON.parse(
     localStorage.getItem("user")
   )
-
+// Render the app with a BrowserRouter to handle routing, and conditionally display the navbar and routes based on whether the user is logged in or not. If the user is not logged in, they are redirected to the login page.
   return (
     <BrowserRouter>
       <div style={styles.app}>

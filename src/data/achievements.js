@@ -1,3 +1,4 @@
+// Creates a list of achievements that users can unlock based on their workout stats, with a name, description, and a check function to determine if the achievement is unlocked
 export const ACHIEVEMENTS = [
   {
     name: "First Rep",

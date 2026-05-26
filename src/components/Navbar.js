@@ -1,15 +1,15 @@
 import { Link } from "react-router-dom"
 import { ACHIEVEMENTS } from "../data/achievements"
-
+// Navbar component that displays the app title, navigation links, and a list of achievements with visual indicators for unlocked achievements based on the provided workouts data
 function Navbar({ workouts }) {
   const unlocked = new Set()
-
+// Iterate through the workouts and their achievements to populate the set of unlocked achievements
   workouts?.forEach(w => {
     (w.achievements || []).forEach(a => {
       unlocked.add(a)
     })
   })
-
+// Render the navigation bar with the app title, links to different pages, and a list of achievement badges that visually indicate whether each achievement is unlocked or not
   return (
     <nav style={styles.nav}>
       <h2>Workout Planner</h2>
@@ -19,7 +19,7 @@ function Navbar({ workouts }) {
         <Link to="/workouts" style={styles.link}>Workouts</Link>
         <Link to="/profile" style={styles.link}>Profile</Link>
       </div>
-
+// Section for displaying achievement badges, with styling that changes based on whether the achievement is unlocked or not
       <div style={styles.achBox}>
         {ACHIEVEMENTS.map((a, i) => {
           const isUnlocked = unlocked.has(a.name)
